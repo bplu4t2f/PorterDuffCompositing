@@ -32,7 +32,7 @@ namespace PorterDuffCompositing
 
 			Debug.Assert(this.background.Size.Equals(this.foreground.Size));
 
-			SetAlpha(this.background, 120);
+			//SetAlpha(this.background, 120);
 
 			foreach (var prop in typeof(PorterDuffCompositingMode).GetProperties(BindingFlags.Public | BindingFlags.Static).Where(x => x.PropertyType == typeof(PorterDuffCompositingMode)))
 			{
@@ -61,18 +61,18 @@ namespace PorterDuffCompositing
 			}
 		}
 
-		private static void SetAlpha(Bitmap bitmap, int alpha)
-		{
-			for (int y = 0; y < bitmap.Height; ++y)
-			{
-				for (int x = 0; x < bitmap.Width; ++x)
-				{
-					var tmp = bitmap.GetPixel(x, y);
-					tmp = Color.FromArgb((int)(alpha * tmp.A / 255.0), tmp.R, tmp.G, tmp.B);
-					bitmap.SetPixel(x, y, tmp);
-				}
-			}
-		}
+		//private static void SetAlpha(Bitmap bitmap, int alpha)
+		//{
+		//	for (int y = 0; y < bitmap.Height; ++y)
+		//	{
+		//		for (int x = 0; x < bitmap.Width; ++x)
+		//		{
+		//			var tmp = bitmap.GetPixel(x, y);
+		//			tmp = Color.FromArgb((int)(alpha * tmp.A / 255.0), tmp.R, tmp.G, tmp.B);
+		//			bitmap.SetPixel(x, y, tmp);
+		//		}
+		//	}
+		//}
 
 		private static Bitmap MakeBitmap(string file, Size? size)
 		{
