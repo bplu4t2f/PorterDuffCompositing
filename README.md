@@ -3,50 +3,60 @@ Demonstrates different Porter/Duff compositing modes.
 
 This implementation is purely in software and is slow and should be used for educational purposes only.
 
+See also:
+
+https://www.w3.org/TR/compositing-1/
+
+http://ssp.impulsetrain.com/porterduff.html
+
+https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing
+
+------
+
 Clear
 
-![Clear](img/Clear.png)
+<img src="img/Clear.png" width="350" />
 
 SourceOnly
 
-![SourceOnly](img/SourceOnly.png)
+<img src="img/SourceOnly.png" width="350" />
 
 DestinationOnly
 
-![DestinationOnly](img/DestinationOnly.png)
+<img src="img/DestinationOnly.png" width="350" />
 
 SourceOver
 
-![SourceOver](img/SourceOver.png)
+<img src="img/SourceOver.png" width="350" />
 
 DestinationOver
 
-![DestinationOver](img/DestinationOver.png)
+<img src="img/DestinationOver.png" width="350" />
 
 SourceIn
 
-![SourceIn](img/SourceIn.png)
+<img src="img/SourceIn.png" width="350" />
 
 DestinationIn
 
-![DestinationIn](img/DestinationIn.png)
+<img src="img/DestinationIn.png" width="350" />
 
 SourceOut
 
-![SourceOut](img/SourceOut.png)
+<img src="img/SourceOut.png" width="350" />
 
 DestinationOut
 
-![DestinationOut](img/DestinationOut.png)
+<img src="img/DestinationOut.png" width="350" />
 
 SourceAtop
 
-![SourceAtop](img/SourceAtop.png)
+<img src="img/SourceAtop.png" width="350" />
 
 DestinationAtop
 
-![DestinationAtop](img/DestinationAtop.png)
+<img src="img/DestinationAtop.png" width="350" />
 
 Xor
 
-![Xor](img/Xor.png)
+<img src="img/Xor.png" width="350" />
