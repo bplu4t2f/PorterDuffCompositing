@@ -138,7 +138,7 @@ namespace PorterDuffCompositing
 
 	public static class PorterDuffCompositing
 	{
-		public static void Compose(IPorterDuffCompositingMode mode, Bitmap source, Bitmap destination)
+		public static void Compose(PorterDuffCompositingMode mode, Bitmap source, Bitmap destination)
 		{
 			var minWidth = Math.Min(source.Width, destination.Width);
 			var minHeight = Math.Min(source.Height, destination.Height);
@@ -232,31 +232,21 @@ namespace PorterDuffCompositing
 		}
 	}
 
-	public interface IPorterDuffCompositingMode
-	{
-		Color ComposePixel(Color source, Color destination);
-	}
-
-	public class PorterDuffCompositingMode : IPorterDuffCompositingMode
+	public class PorterDuffCompositingMode
 	{
 		public PorterDuffCompositingMode(Func<Color, Color, Color> func)
 		{
-			this.func = func;
+			this.ComposePixel = func ?? throw new ArgumentNullException(nameof(func));
 		}
 
-		private readonly Func<Color, Color, Color> func;
-
-		public Color ComposePixel(Color source, Color destination)
-		{
-			return this.func(source, destination);
-		}
+		public Func<Color, Color, Color> ComposePixel { get; }
 
 		public static Color SourceOverFunc(Color source, Color destination)
 		{
 			// co = αs x Cs + αb x Cb x (1 – αs)
 			// αo = αs + αb x (1 – αs)
 
-			double alpha = source.A + destination.A - source.A * destination.A / 255.0;
+			double alpha = source.A + destination.A * (1.0 - source.A / 255.0);
 
 			return Color.FromArgb(
 				(int)alpha,
@@ -268,15 +258,42 @@ namespace PorterDuffCompositing
 
 		private static int SourceOverRGB(double sa, double SC, double da, double DC, double alpha)
 		{
-			double color_with_alpha = (sa * SC + da * DC - sa * da / 255.0 * DC);
-			double tmp = color_with_alpha / alpha;
-			if (Double.IsNaN(tmp) || tmp < 0 || tmp > 255)
+			// Normally, the full formula would be:
+			// co = (αs x Cs + αb x Cb x (1 – αs)) / αR
+			// , where αR is the alpha value of the resulting color that we need to have already calculated at this point.
+			// alpha == 0 can only happen if sa == 0 AND da == 0 (see alpha formula).
+			// In this case, neither the source nor the destination actually contributed anything to the result.
+			// With no contribuations, the resulting color is undefined (it's not even black or white).
+			// However, that is awkward in some scenarios. Like say you blend an image with an alpha mask onto a completely transparent background.
+			// In those places where the alpha mask makes the source image completely transparent, you might expect the color values of the blended
+			// pixels to still be the source color. This has the advantage of retaining color information in transparent places in PNG files for example.
+			// We can actually do that though with some math.
+			// Say da = 0.
+			// Then alpha == sa (see alpha formula)
+			// Also, color_with_alpha == sa * SC.
+			// Then, tmp == color_with_alpha / alpha == SC * sa / sa == SC
+			// This is true even if sa == 0 as well.
+			// Similarly, say sa = 0.
+			// Then alpha == da
+			// color_with_alpha = da * DC
+			// tmp == DC
+			// This is true even if da == 0 as well.
+			// Note that this is does not change anything if the result is used in the next blending step because it would be multiplied with the
+			// respective alpha value (which is going to be 0) anyway.
+			double tmp;
+			if (sa == 0)
 			{
-				if (alpha < 0.5)
-				{
-					return 0;
-				}
-				int j = 5;
+				tmp = DC;
+			}
+			else if (da == 0)
+			{
+				tmp = SC;
+			}
+			else
+			{
+				double color_with_alpha = sa * SC + da * DC * (1.0 - sa / 255.0);
+				// alpha can't be 0 here.
+				tmp = color_with_alpha / alpha;
 			}
 			return (int)tmp;
 		}
